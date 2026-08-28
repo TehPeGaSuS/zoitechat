@@ -900,6 +900,18 @@ fe_text_clear (struct session *sess, int lines)
 }
 
 void
+fe_hide_last_line (struct session *sess, unsigned int group)
+{
+	gtk_xtext_set_last_hidden (sess->res->buffer, group);
+}
+
+void
+fe_toggle_hidden_group (struct session *sess, unsigned int group)
+{
+	gtk_xtext_toggle_hidden_group (sess->res->buffer, group);
+}
+
+void
 fe_close_window (struct session *sess)
 {
 	if (sess->gui->is_tab)

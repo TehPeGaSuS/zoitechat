@@ -709,6 +709,14 @@ fe_text_clear (struct session *sess, int lines)
 {
 }
 void
+fe_hide_last_line (struct session *sess, unsigned int group)
+{
+}
+void
+fe_toggle_hidden_group (struct session *sess, unsigned int group)
+{
+}
+void
 fe_progressbar_start (struct session *sess)
 {
 }

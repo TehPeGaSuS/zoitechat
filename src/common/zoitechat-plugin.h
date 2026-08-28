@@ -193,6 +193,8 @@ struct _zoitechat_plugin
 	zoitechat_event_attrs *(*zoitechat_event_attrs_create) (zoitechat_plugin *ph);
 	void (*zoitechat_event_attrs_free) (zoitechat_plugin *ph,
 									  zoitechat_event_attrs *attrs);
+	int (*zoitechat_hide_last_line) (zoitechat_plugin *ph, unsigned int group);
+	int (*zoitechat_toggle_hidden_group) (zoitechat_plugin *ph, unsigned int group);
 };
 #endif
 
@@ -208,6 +210,14 @@ zoitechat_hook_command (zoitechat_plugin *ph,
 zoitechat_event_attrs *zoitechat_event_attrs_create (zoitechat_plugin *ph);
 
 void zoitechat_event_attrs_free (zoitechat_plugin *ph, zoitechat_event_attrs *attrs);
+
+/* smartfilter: hide the most recently printed line in the plugin's
+ * current context, tagged with 'group' for later toggling. */
+int zoitechat_hide_last_line (zoitechat_plugin *ph, unsigned int group);
+
+/* smartfilter: flip hidden/visible for every line tagged with 'group'
+ * in the plugin's current context. */
+int zoitechat_toggle_hidden_group (zoitechat_plugin *ph, unsigned int group);
 
 zoitechat_hook *
 zoitechat_hook_server (zoitechat_plugin *ph,
@@ -451,6 +461,8 @@ zoitechat_pluginpref_list (zoitechat_plugin *ph,
 #define zoitechat_pluginpref_get_int ((ZOITECHAT_PLUGIN_HANDLE)->zoitechat_pluginpref_get_int)
 #define zoitechat_pluginpref_delete ((ZOITECHAT_PLUGIN_HANDLE)->zoitechat_pluginpref_delete)
 #define zoitechat_pluginpref_list ((ZOITECHAT_PLUGIN_HANDLE)->zoitechat_pluginpref_list)
+#define zoitechat_hide_last_line ((ZOITECHAT_PLUGIN_HANDLE)->zoitechat_hide_last_line)
+#define zoitechat_toggle_hidden_group ((ZOITECHAT_PLUGIN_HANDLE)->zoitechat_toggle_hidden_group)
 #endif
 
 #ifdef __cplusplus

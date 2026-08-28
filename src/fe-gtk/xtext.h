@@ -280,6 +280,8 @@ int gtk_xtext_set_font (GtkXText *xtext, char *name);
 void gtk_xtext_set_background (GtkXText * xtext, cairo_surface_t *surface);
 void gtk_xtext_set_palette (GtkXText * xtext, const XTextColor *palette);
 void gtk_xtext_clear (xtext_buffer *buf, int lines);
+void gtk_xtext_set_last_hidden (xtext_buffer *buf, guint32 group);
+void gtk_xtext_toggle_hidden_group (xtext_buffer *buf, guint32 group);
 void gtk_xtext_save (GtkXText * xtext, int fh);
 void gtk_xtext_refresh (GtkXText * xtext);
 int gtk_xtext_lastlog (xtext_buffer *out, xtext_buffer *search_area);

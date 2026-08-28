@@ -149,6 +149,8 @@ struct _zoitechat_plugin
 	zoitechat_event_attrs *(*zoitechat_event_attrs_create) (zoitechat_plugin *ph);
 	void (*zoitechat_event_attrs_free) (zoitechat_plugin *ph,
 									  zoitechat_event_attrs *attrs);
+	int (*zoitechat_hide_last_line) (zoitechat_plugin *ph, unsigned int group);
+	int (*zoitechat_toggle_hidden_group) (zoitechat_plugin *ph, unsigned int group);
 
 	/* PRIVATE FIELDS! */
 	void *handle;		/* from dlopen */

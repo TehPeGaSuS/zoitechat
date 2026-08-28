@@ -350,6 +350,8 @@ plugin_add (session *sess, char *filename, void *handle, void *init_func,
 		pl->zoitechat_emit_print_attrs = zoitechat_emit_print_attrs;
 		pl->zoitechat_event_attrs_create = zoitechat_event_attrs_create;
 		pl->zoitechat_event_attrs_free = zoitechat_event_attrs_free;
+		pl->zoitechat_hide_last_line = zoitechat_hide_last_line;
+		pl->zoitechat_toggle_hidden_group = zoitechat_toggle_hidden_group;
 
 		/* run zoitechat_plugin_init, if it returns 0, close the plugin */
 		if (((zoitechat_init_func *)init_func) (pl, &pl->name, &pl->desc, &pl->version, arg) == 0)
@@ -690,6 +692,26 @@ void
 zoitechat_event_attrs_free (zoitechat_plugin *ph, zoitechat_event_attrs *attrs)
 {
 	g_free (attrs);
+}
+
+int
+zoitechat_hide_last_line (zoitechat_plugin *ph, unsigned int group)
+{
+	if (!ph->context || !is_session (ph->context))
+		return 0;
+
+	fe_hide_last_line (ph->context, group);
+	return 1;
+}
+
+int
+zoitechat_toggle_hidden_group (zoitechat_plugin *ph, unsigned int group)
+{
+	if (!ph->context || !is_session (ph->context))
+		return 0;
+
+	fe_toggle_hidden_group (ph->context, group);
+	return 1;
 }
 
 /* got a server PRIVMSG, NOTICE, numeric etc... */

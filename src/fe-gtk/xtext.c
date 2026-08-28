@@ -92,6 +92,8 @@ struct textentry
 	guchar pad1;
 	guchar pad2;
 	GList *marks;	/* List of found strings */
+	guint32 sf_group;	/* smart-filter group id, 0 = none */
+	gboolean hidden;	/* smart-filter: skip in reflow/render */
 };
 
 enum
@@ -4337,6 +4339,10 @@ gtk_xtext_lines_taken (xtext_buffer *buf, textentry * ent)
 	g_slist_free (ent->sublines);
 	ent->sublines = NULL;
 	ent->subline_count = 0;
+
+	if (ent->hidden)
+		return ent->subline_count;
+
 	win_width = buf->window_width - MARGIN;
 
 	if (win_width >= ent->indent + ent->str_width)
@@ -5435,6 +5441,8 @@ gtk_xtext_append_entry (xtext_buffer *buf, textentry * ent, time_t stamp)
 	ent->next = NULL;
 	ent->marks = NULL;
 	ent->subline_count = 0;
+	ent->hidden = FALSE;
+	ent->sf_group = 0;
 
 	if (ent->indent < MARGIN)
 		ent->indent = MARGIN;	  /* 2 pixels is the left margin */
@@ -5450,7 +5458,7 @@ gtk_xtext_append_entry (xtext_buffer *buf, textentry * ent, time_t stamp)
 	ent->sublines = NULL;
 	buf->num_lines += gtk_xtext_lines_taken (buf, ent);
 
-	if ((buf->marker_pos == NULL || buf->marker_seen) && (buf->xtext->buffer != buf || 
+	if ((buf->marker_pos == NULL || buf->marker_seen) && (buf->xtext->buffer != buf ||
 		!gtk_window_has_toplevel_focus (GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (buf->xtext))))))
 	{
 		buf->marker_pos = ent;
@@ -5504,6 +5512,58 @@ gtk_xtext_append_entry (xtext_buffer *buf, textentry * ent, time_t stamp)
 		gl = gtk_xtext_search_textentry (buf, ent);
 		gtk_xtext_search_textentry_add (buf, ent, gl, FALSE);
 	}
+}
+
+/* smartfilter: mark the most recently appended entry as hidden, tagged
+ * with 'group' so a later gtk_xtext_toggle_hidden_group() call can find
+ * and reveal it again without disturbing unrelated hidden lines. */
+
+void
+gtk_xtext_set_last_hidden (xtext_buffer *buf, guint32 group)
+{
+	textentry *ent;
+
+	if (!buf)
+		return;
+
+	ent = buf->text_last;
+	if (!ent)
+		return;
+
+	ent->sf_group = group;
+	ent->hidden = TRUE;
+
+	gtk_xtext_calc_lines (buf, TRUE);
+	gtk_xtext_adjustment_set (buf, TRUE);
+	if (buf->xtext->buffer == buf)
+		gtk_xtext_refresh (buf->xtext);
+}
+
+/* smartfilter: flip the hidden state of every entry tagged with 'group'
+ * in this buffer. Used to implement the WeeChat Alt+- style toggle with
+ * true in-place reveal (lines never leave the buffer, they're just
+ * excluded from reflow/paint while hidden). */
+
+void
+gtk_xtext_toggle_hidden_group (xtext_buffer *buf, guint32 group)
+{
+	textentry *ent;
+
+	if (!buf || group == 0)
+		return;
+
+	ent = buf->text_first;
+	while (ent)
+	{
+		if (ent->sf_group == group)
+			ent->hidden = !ent->hidden;
+		ent = ent->next;
+	}
+
+	gtk_xtext_calc_lines (buf, TRUE);
+	gtk_xtext_adjustment_set (buf, TRUE);
+	if (buf->xtext->buffer == buf)
+		gtk_xtext_refresh (buf->xtext);
 }
 
 /* the main two public functions */

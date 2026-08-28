@@ -13,6 +13,7 @@ __all__ = [
     'hook_print', 'hook_print_attrs', 'hook_server', 'hook_server_attrs',
     'hook_timer', 'hook_unload', 'list_pluginpref', 'nickcmp', 'prnt',
     'set_pluginpref', 'strip', 'unhook',
+    'hide_last_line', 'toggle_hidden_group',
 ]
 
 __doc__ = 'ZoiteChat Scripting Interface'
@@ -81,6 +82,14 @@ def emit_print(event_name, *args, **kwargs):
 
 def command(command):
     lib.zoitechat_command(lib.ph, command.encode())
+
+
+def hide_last_line(group):
+    return bool(lib.zoitechat_hide_last_line(lib.ph, group))
+
+
+def toggle_hidden_group(group):
+    return bool(lib.zoitechat_toggle_hidden_group(lib.ph, group))
 
 
 def nickcmp(string1, string2):
