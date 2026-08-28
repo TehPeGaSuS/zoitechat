@@ -378,6 +378,14 @@ class Context:
         with self.__change_context():
             return get_list(name)
 
+    def hide_last_line(self, group):
+        with self.__change_context():
+            return hide_last_line(group)
+
+    def toggle_hidden_group(self, group):
+        with self.__change_context():
+            return toggle_hidden_group(group)
+
 
 def get_context():
     ctx = lib.zoitechat_get_context(lib.ph)
