@@ -169,7 +169,8 @@ static const setting appearance_settings[] =
 
         {ST_HEADER,     N_("Text Box"),0,0,0},
         {ST_TOGGLE, N_("Colored nick names"), P_OFFINTNL(hex_text_color_nicks), N_("Give each person on IRC a different color"),0,0},
-        {ST_TOGGLR, N_("Indent nick names"), P_OFFINTNL(hex_text_indent), N_("Make nick names right-justified"),0,0},
+        {ST_TOGGLR, N_("Indent nick names"), P_OFFINTNL(hex_text_indent), N_("Make nick names right-justified"),0,1},
+        {ST_NUMBER, N_("Limit nick column to:"), P_OFFINTNL(hex_text_max_indent_chars), N_("0 = unlimited (grows to fit the longest nickname)"), (const char **)N_("letters."), 99},
         {ST_TOGGLE, N_ ("Show marker line"), P_OFFINTNL (hex_text_show_marker), N_ ("Insert a red line after the last read text."), 0, 0},
 
         {ST_HEADER,     N_("Timestamps"),0,0,0},
@@ -848,7 +849,7 @@ setup_topicbar_inline_toggled_cb (GtkToggleButton *but, gpointer userdata)
                         !gtk_toggle_button_get_active (but));
 }
 
-static void
+static GtkWidget *
 setup_create_toggleR (GtkWidget *tab, int row, const setting *set)
 {
         GtkWidget *wid;
@@ -862,6 +863,7 @@ setup_create_toggleR (GtkWidget *tab, int row, const setting *set)
                 gtk_widget_set_tooltip_text (wid, _(set->tooltip));
         setup_table_attach (tab, wid, 4, 5, row, row + 1, TRUE, FALSE,
                             SETUP_ALIGN_FILL, SETUP_ALIGN_FILL, 0, 0);
+        return wid;
 }
 
 static GtkWidget *
@@ -1564,7 +1566,9 @@ setup_create_page (const setting *set)
                         break;
                 case ST_TOGGLR:
                         row--;
-                        setup_create_toggleR (tab, row, &set[i]);
+                        wid = setup_create_toggleR (tab, row, &set[i]);
+                        if (set[i].extra)
+                                do_disable = set[i].extra;
                         break;
                 case ST_TOGGLE:
                         wid = setup_create_toggleL (tab, row, &set[i]);

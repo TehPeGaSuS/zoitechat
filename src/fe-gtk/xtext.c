@@ -5520,6 +5520,7 @@ gtk_xtext_append_indent (xtext_buffer *buf,
 	int tempindent;
 	int prefix_width;
 	int min_indent;
+	int max_indent;
 
 	if (left_len == -1)
 		left_len = strlen (left_text);
@@ -5560,9 +5561,21 @@ gtk_xtext_append_indent (xtext_buffer *buf,
 
 	min_indent = MARGIN + space;
 
+	/* Cap the auto-grown nick column at N characters (approximated by
+	 * the font's space width), if the user set a limit in Preferences
+	 * -> Appearance -> Text Box -> "Limit nick column to:". 0 = no
+	 * extra cap beyond the existing pixel-based max_auto_indent. */
+	max_indent = buf->xtext->max_auto_indent;
+	if (prefs.hex_text_max_indent_chars > 0)
+	{
+		int char_cap = min_indent + prefs.hex_text_max_indent_chars * buf->xtext->space_width;
+		if (char_cap < max_indent)
+			max_indent = char_cap;
+	}
+
 	/* do we need to auto adjust the separator position? */
 	if (buf->xtext->auto_indent &&
-		 buf->indent < buf->xtext->max_auto_indent &&
+		 buf->indent < max_indent &&
 		 ent->indent < min_indent)
 	{
 		tempindent = min_indent + prefix_width;
@@ -5573,8 +5586,8 @@ gtk_xtext_append_indent (xtext_buffer *buf,
 		if (tempindent > buf->indent + buf->xtext->space_width)
 			buf->indent = tempindent;
 
-		if (buf->indent > buf->xtext->max_auto_indent)
-			buf->indent = buf->xtext->max_auto_indent;
+		if (buf->indent > max_indent)
+			buf->indent = max_indent;
 
 		if (buf->indent > ent->indent + prefix_width)
 		{
